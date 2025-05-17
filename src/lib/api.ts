@@ -1,264 +1,147 @@
 
-import { supabase } from '@/integrations/supabase/client';
+import { supabaseClient } from '@/integrations/supabase/client';
 import { generateStudySessions } from '@/lib/gemini';
-import { toast } from '@/components/ui/use-toast';
 
-interface Task {
-  id?: string;
-  clerk_id: string;
-  title: string;
-  description?: string;
-  due_date?: string;
-  priority?: string;
-  subject?: string;
-  status?: string;
-  created_at?: string;
-  updated_at?: string;
-}
-
-interface StudySession {
-  id?: string;
-  clerk_id: string;
-  title: string;
-  description?: string;
-  start_time: string;
-  end_time: string;
-  subject?: string;
-  status?: string;
-  related_task_id?: string;
-  created_at?: string;
-  updated_at?: string;
-}
-
-// Task functions
-export async function fetchTasks(clerkId: string) {
-  const { data, error } = await supabase
-    .from('tasks')
-    .select('*')
-    .eq('clerk_id', clerkId)
-    .order('due_date', { ascending: true, nullsLast: true });
-  
-  if (error) {
-    console.error('Error fetching tasks:', error);
-    toast({
-      title: 'Error',
-      description: 'Failed to load tasks.',
-      variant: 'destructive',
-    });
-    return [];
-  }
-  
-  return data;
-}
-
-export async function addTask(task: Task) {
-  const { data, error } = await supabase
-    .from('tasks')
-    .insert(task)
-    .select()
-    .single();
-  
-  if (error) {
-    console.error('Error adding task:', error);
-    toast({
-      title: 'Error',
-      description: 'Failed to add task.',
-      variant: 'destructive',
-    });
-    return null;
-  }
-  
-  return data;
-}
-
-export async function updateTask(id: string, updates: Partial<Task>) {
-  const { data, error } = await supabase
-    .from('tasks')
-    .update({ ...updates, updated_at: new Date().toISOString() })
-    .eq('id', id)
-    .select()
-    .single();
-  
-  if (error) {
-    console.error('Error updating task:', error);
-    toast({
-      title: 'Error',
-      description: 'Failed to update task.',
-      variant: 'destructive',
-    });
-    return null;
-  }
-  
-  return data;
-}
-
-export async function deleteTask(id: string) {
-  const { error } = await supabase
-    .from('tasks')
-    .delete()
-    .eq('id', id);
-  
-  if (error) {
-    console.error('Error deleting task:', error);
-    toast({
-      title: 'Error',
-      description: 'Failed to delete task.',
-      variant: 'destructive',
-    });
-    return false;
-  }
-  
-  return true;
-}
-
-// Study sessions functions
-export async function fetchStudySessions(clerkId: string) {
-  const { data, error } = await supabase
+// Fetch study sessions for a user
+export const fetchStudySessions = async (clerkId: string) => {
+  const { data, error } = await supabaseClient
     .from('study_sessions')
     .select('*')
     .eq('clerk_id', clerkId)
     .order('start_time', { ascending: true });
   
   if (error) {
-    console.error('Error fetching study sessions:', error);
-    toast({
-      title: 'Error',
-      description: 'Failed to load study sessions.',
-      variant: 'destructive',
-    });
-    return [];
+    throw error;
   }
   
   return data;
-}
+};
 
-export async function addStudySession(session: StudySession) {
-  const { data, error } = await supabase
+// Add a study session
+export const addStudySession = async (sessionData: any) => {
+  const { data, error } = await supabaseClient
     .from('study_sessions')
-    .insert(session)
+    .insert(sessionData)
     .select()
     .single();
   
   if (error) {
-    console.error('Error adding study session:', error);
-    toast({
-      title: 'Error',
-      description: 'Failed to add study session.',
-      variant: 'destructive',
-    });
-    return null;
+    throw error;
   }
   
   return data;
-}
+};
 
-export async function updateStudySession(id: string, updates: Partial<StudySession>) {
-  const { data, error } = await supabase
+// Update a study session
+export const updateStudySession = async (sessionId: string, sessionData: any) => {
+  const { data, error } = await supabaseClient
     .from('study_sessions')
-    .update({ ...updates, updated_at: new Date().toISOString() })
-    .eq('id', id)
+    .update(sessionData)
+    .eq('id', sessionId)
     .select()
     .single();
   
   if (error) {
-    console.error('Error updating study session:', error);
-    toast({
-      title: 'Error',
-      description: 'Failed to update study session.',
-      variant: 'destructive',
-    });
-    return null;
+    throw error;
   }
   
   return data;
-}
+};
 
-export async function deleteStudySession(id: string) {
-  const { error } = await supabase
+// Delete a study session
+export const deleteStudySession = async (sessionId: string) => {
+  const { error } = await supabaseClient
     .from('study_sessions')
     .delete()
-    .eq('id', id);
+    .eq('id', sessionId);
   
   if (error) {
-    console.error('Error deleting study session:', error);
-    toast({
-      title: 'Error',
-      description: 'Failed to delete study session.',
-      variant: 'destructive',
-    });
-    return false;
+    throw error;
   }
   
   return true;
-}
+};
 
-// AI-powered session generation
-export async function generateAndSaveStudySessions(clerkId: string) {
+// Fetch tasks for a user
+export const fetchTasks = async (clerkId: string) => {
+  const { data, error } = await supabaseClient
+    .from('tasks')
+    .select('*')
+    .eq('clerk_id', clerkId)
+    .order('due_date', { ascending: true });
+  
+  if (error) {
+    throw error;
+  }
+  
+  return data;
+};
+
+// Generate and save study sessions from tasks using Gemini AI
+export const generateAndSaveStudySessions = async (clerkId: string) => {
   try {
-    // Fetch all tasks for this user
+    // Fetch user's tasks
     const tasks = await fetchTasks(clerkId);
     
     if (tasks.length === 0) {
-      toast({
-        title: 'No tasks found',
-        description: 'Please add some tasks first to generate study sessions.',
-      });
-      return [];
+      throw new Error('No tasks found to generate study sessions');
     }
     
-    // Generate study sessions using Gemini AI
-    const aiGeneratedSessions = await generateStudySessions(tasks);
+    // Generate study sessions using Gemini
+    const studySessions = await generateStudySessions(tasks);
     
-    if (aiGeneratedSessions.length === 0) {
-      toast({
-        title: 'Generation failed',
-        description: 'Could not generate study sessions. Please try again.',
-        variant: 'destructive',
-      });
-      return [];
+    if (!studySessions || studySessions.length === 0) {
+      throw new Error('Failed to generate study sessions');
     }
     
-    // Prepare sessions to save to the database
-    const sessionsToSave = aiGeneratedSessions.map(session => ({
-      clerk_id: clerkId,
-      title: session.title,
-      description: session.description,
-      start_time: session.start_time,
-      end_time: session.end_time,
-      subject: session.subject,
-      related_task_id: session.related_task_id,
-      status: 'scheduled'
+    // Add clerk_id to each session
+    const sessionsWithClerkId = studySessions.map((session: any) => ({
+      ...session,
+      clerk_id: clerkId
     }));
     
-    // Save sessions to database
-    const { data, error } = await supabase
+    // Insert all sessions
+    const { data, error } = await supabaseClient
       .from('study_sessions')
-      .insert(sessionsToSave)
+      .insert(sessionsWithClerkId)
       .select();
-    
+      
     if (error) {
-      console.error('Error saving generated study sessions:', error);
-      toast({
-        title: 'Error',
-        description: 'Failed to save generated study sessions.',
-        variant: 'destructive',
-      });
-      return [];
+      throw error;
     }
-    
-    toast({
-      title: 'Success',
-      description: `Generated ${data.length} study sessions for your tasks.`,
-    });
     
     return data;
   } catch (error) {
-    console.error('Error in generate and save study sessions:', error);
-    toast({
-      title: 'Error',
-      description: 'An unexpected error occurred while generating study sessions.',
-      variant: 'destructive',
-    });
-    return [];
+    console.error('Error generating sessions:', error);
+    throw error;
   }
-}
+};
+
+// User methods for Supabase
+export const createOrUpdateUser = async (userData: any) => {
+  const { data, error } = await supabaseClient
+    .from('users')
+    .upsert(userData)
+    .select()
+    .single();
+  
+  if (error) {
+    throw error;
+  }
+  
+  return data;
+};
+
+export const getUser = async (clerkId: string) => {
+  const { data, error } = await supabaseClient
+    .from('users')
+    .select('*')
+    .eq('clerk_id', clerkId)
+    .maybeSingle();
+  
+  if (error) {
+    throw error;
+  }
+  
+  return data;
+};

@@ -8,7 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { format, isWithinInterval, parseISO, startOfDay, addHours } from 'date-fns';
-import { CalendarIcon, Magic, Pencil, Plus, Trash2 } from 'lucide-react';
+import { CalendarIcon, Sparkles, Pencil, Plus, Trash2 } from 'lucide-react';
 import { useAuth } from '@/context/auth';
 import { fetchStudySessions, addStudySession, updateStudySession, deleteStudySession, generateAndSaveStudySessions } from '@/lib/api';
 import { toast } from '@/components/ui/use-toast';
@@ -99,7 +99,7 @@ const EnhancedCalendar = () => {
   };
   
   // Calendar day renderer
-  const renderDay = (day: Date) => {
+  const renderDay = (day: Date, cellProps: object) => {
     const dayStart = startOfDay(day);
     const sessionsOnDay = sessions.filter((session) => {
       const sessionStart = parseISO(session.start_time);
@@ -296,7 +296,7 @@ const EnhancedCalendar = () => {
               onClick={handleGenerateSessions}
               disabled={isGenerating}
             >
-              <Magic className="h-4 w-4 mr-1" />
+              <Sparkles className="h-4 w-4 mr-1" />
               {isGenerating ? 'Generating...' : 'AI Generate'}
             </Button>
           </div>
@@ -309,7 +309,9 @@ const EnhancedCalendar = () => {
             selected={date}
             onSelect={(newDate) => newDate && setDate(newDate)}
             className="rounded-md border"
-            components={{ day: renderDay }}
+            components={{
+              Day: renderDay
+            }}
           />
         </div>
         
@@ -429,7 +431,7 @@ const EnhancedCalendar = () => {
                   mode="single"
                   selected={formData.date}
                   onSelect={(newDate) => newDate && setFormData({...formData, date: newDate})}
-                  className="rounded-md border"
+                  className="rounded-md border pointer-events-auto"
                 />
               </div>
               
