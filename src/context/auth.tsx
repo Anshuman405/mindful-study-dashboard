@@ -4,8 +4,8 @@ import { ClerkProvider, SignedIn, SignedOut, RedirectToSignIn, useUser } from '@
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/components/ui/use-toast';
 
-// Replace with your actual publishable key
-const PUBLISHABLE_KEY = "pk_test_Y29tcGxldGUtbWlubm93LTU1LmNsZXJrLmFjY291bnRzLmRldiQ";
+// Updated publishable key to use the one provided
+const PUBLISHABLE_KEY = "pk_test_aW50aW1hdGUtdGFycG9uLTU5LmNsZXJrLmFjY291bnRzLmRldiQ";
 
 const AuthContext = createContext<{
   isLoading: boolean;
