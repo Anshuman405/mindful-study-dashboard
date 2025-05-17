@@ -4,12 +4,15 @@ import Header from '@/components/layout/Header';
 import Sidebar from '@/components/layout/Sidebar';
 import MobileNav from '@/components/layout/MobileNav';
 import BrainDump from '@/components/dashboard/BrainDump';
-import CalendarView from '@/components/dashboard/Calendar';
+import EnhancedCalendar from '@/components/dashboard/EnhancedCalendar';
 import TaskBoard from '@/components/dashboard/TaskBoard';
 import StudyMaterials from '@/components/dashboard/StudyMaterials';
 import ProgressCard from '@/components/dashboard/ProgressCard';
+import { useAuth } from '@/context/auth';
 
 const Index = () => {
+  const { userId } = useAuth();
+  
   return (
     <div className="min-h-screen bg-neutral-50 flex flex-col">
       <Header />
@@ -33,7 +36,7 @@ const Index = () => {
                 <TaskBoard />
               </div>
               <div>
-                <CalendarView />
+                <EnhancedCalendar />
               </div>
               <div className="lg:col-span-3">
                 <StudyMaterials />

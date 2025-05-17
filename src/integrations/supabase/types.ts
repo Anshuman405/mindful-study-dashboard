@@ -9,7 +9,137 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      study_sessions: {
+        Row: {
+          clerk_id: string
+          created_at: string
+          description: string | null
+          end_time: string
+          id: string
+          related_task_id: string | null
+          start_time: string
+          status: string | null
+          subject: string | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          clerk_id: string
+          created_at?: string
+          description?: string | null
+          end_time: string
+          id?: string
+          related_task_id?: string | null
+          start_time: string
+          status?: string | null
+          subject?: string | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          clerk_id?: string
+          created_at?: string
+          description?: string | null
+          end_time?: string
+          id?: string
+          related_task_id?: string | null
+          start_time?: string
+          status?: string | null
+          subject?: string | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "study_sessions_clerk_id_fkey"
+            columns: ["clerk_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["clerk_id"]
+          },
+          {
+            foreignKeyName: "study_sessions_related_task_id_fkey"
+            columns: ["related_task_id"]
+            isOneToOne: false
+            referencedRelation: "tasks"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      tasks: {
+        Row: {
+          clerk_id: string
+          created_at: string
+          description: string | null
+          due_date: string | null
+          id: string
+          priority: string | null
+          status: string | null
+          subject: string | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          clerk_id: string
+          created_at?: string
+          description?: string | null
+          due_date?: string | null
+          id?: string
+          priority?: string | null
+          status?: string | null
+          subject?: string | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          clerk_id?: string
+          created_at?: string
+          description?: string | null
+          due_date?: string | null
+          id?: string
+          priority?: string | null
+          status?: string | null
+          subject?: string | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tasks_clerk_id_fkey"
+            columns: ["clerk_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["clerk_id"]
+          },
+        ]
+      }
+      users: {
+        Row: {
+          clerk_id: string
+          created_at: string
+          email: string | null
+          id: string
+          name: string | null
+          updated_at: string
+        }
+        Insert: {
+          clerk_id: string
+          created_at?: string
+          email?: string | null
+          id?: string
+          name?: string | null
+          updated_at?: string
+        }
+        Update: {
+          clerk_id?: string
+          created_at?: string
+          email?: string | null
+          id?: string
+          name?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
