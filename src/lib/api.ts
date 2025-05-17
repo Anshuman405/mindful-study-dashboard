@@ -1,10 +1,10 @@
 
-import { supabaseClient } from '@/integrations/supabase/client';
+import { supabase } from '@/integrations/supabase/client';
 import { generateStudySessions } from '@/lib/gemini';
 
 // Fetch study sessions for a user
 export const fetchStudySessions = async (clerkId: string) => {
-  const { data, error } = await supabaseClient
+  const { data, error } = await supabase
     .from('study_sessions')
     .select('*')
     .eq('clerk_id', clerkId)
@@ -19,7 +19,7 @@ export const fetchStudySessions = async (clerkId: string) => {
 
 // Add a study session
 export const addStudySession = async (sessionData: any) => {
-  const { data, error } = await supabaseClient
+  const { data, error } = await supabase
     .from('study_sessions')
     .insert(sessionData)
     .select()
@@ -34,7 +34,7 @@ export const addStudySession = async (sessionData: any) => {
 
 // Update a study session
 export const updateStudySession = async (sessionId: string, sessionData: any) => {
-  const { data, error } = await supabaseClient
+  const { data, error } = await supabase
     .from('study_sessions')
     .update(sessionData)
     .eq('id', sessionId)
@@ -50,7 +50,7 @@ export const updateStudySession = async (sessionId: string, sessionData: any) =>
 
 // Delete a study session
 export const deleteStudySession = async (sessionId: string) => {
-  const { error } = await supabaseClient
+  const { error } = await supabase
     .from('study_sessions')
     .delete()
     .eq('id', sessionId);
@@ -64,7 +64,7 @@ export const deleteStudySession = async (sessionId: string) => {
 
 // Fetch tasks for a user
 export const fetchTasks = async (clerkId: string) => {
-  const { data, error } = await supabaseClient
+  const { data, error } = await supabase
     .from('tasks')
     .select('*')
     .eq('clerk_id', clerkId)
@@ -75,6 +75,51 @@ export const fetchTasks = async (clerkId: string) => {
   }
   
   return data;
+};
+
+// Add a task
+export const addTask = async (taskData: any) => {
+  const { data, error } = await supabase
+    .from('tasks')
+    .insert(taskData)
+    .select()
+    .single();
+  
+  if (error) {
+    throw error;
+  }
+  
+  return data;
+};
+
+// Update a task
+export const updateTask = async (taskId: string, taskData: any) => {
+  const { data, error } = await supabase
+    .from('tasks')
+    .update(taskData)
+    .eq('id', taskId)
+    .select()
+    .single();
+  
+  if (error) {
+    throw error;
+  }
+  
+  return data;
+};
+
+// Delete a task
+export const deleteTask = async (taskId: string) => {
+  const { error } = await supabase
+    .from('tasks')
+    .delete()
+    .eq('id', taskId);
+  
+  if (error) {
+    throw error;
+  }
+  
+  return true;
 };
 
 // Generate and save study sessions from tasks using Gemini AI
@@ -101,7 +146,7 @@ export const generateAndSaveStudySessions = async (clerkId: string) => {
     }));
     
     // Insert all sessions
-    const { data, error } = await supabaseClient
+    const { data, error } = await supabase
       .from('study_sessions')
       .insert(sessionsWithClerkId)
       .select();
@@ -119,7 +164,7 @@ export const generateAndSaveStudySessions = async (clerkId: string) => {
 
 // User methods for Supabase
 export const createOrUpdateUser = async (userData: any) => {
-  const { data, error } = await supabaseClient
+  const { data, error } = await supabase
     .from('users')
     .upsert(userData)
     .select()
@@ -133,7 +178,7 @@ export const createOrUpdateUser = async (userData: any) => {
 };
 
 export const getUser = async (clerkId: string) => {
-  const { data, error } = await supabaseClient
+  const { data, error } = await supabase
     .from('users')
     .select('*')
     .eq('clerk_id', clerkId)
